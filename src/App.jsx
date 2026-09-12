@@ -161,7 +161,29 @@ function Wellbeing() {
 
 function Booking() {
   const [sent, setSent] = useState(false);
-  const submit = e => { e.preventDefault(); setSent(true); };
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
+  const submit = async e => {
+    e.preventDefault();
+    setError("");
+    const endpoint = import.meta.env.VITE_FORMSPREE_ENDPOINT
+      || `https://formsubmit.co/ajax/${profile.email}`;
+
+    setSending(true);
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: new FormData(e.currentTarget)
+      });
+      if (!response.ok) throw new Error("Request failed");
+      setSent(true);
+    } catch {
+      setError("Something went wrong. Please email me directly and I will get back to you.");
+    } finally {
+      setSending(false);
+    }
+  };
   return (
     <section className="section shell booking" id="book">
       <SectionLabel>Free 1:1 mentoring</SectionLabel>
@@ -179,16 +201,17 @@ function Booking() {
         </div>
         <form className="booking-form" onSubmit={submit}>
           {sent ? (
-            <div className="success"><Check size={28}/><h3>Request received.</h3><p>Thanks. Replace this form handler with your email/calendar integration.</p></div>
+            <div className="success"><Check size={28}/><h3>Request received.</h3><p>Thanks. I will get back to you within 24–48 hours.</p></div>
           ) : (
             <>
-              <label>Name<input required placeholder="Your name"/></label>
-              <label>Email<input required type="email" placeholder="you@example.com"/></label>
+              <label>Name<input name="name" required placeholder="Your name"/></label>
+              <label>Email<input name="email" required type="email" placeholder="you@example.com"/></label>
               <label>What do you want help with?
-                <select defaultValue=""><option value="" disabled>Select a topic</option><option>Data Structures & Algorithms</option><option>System Design</option><option>Embedded Technologies</option><option>Career & interview prep</option><option>Spirituality & mental well-being</option></select>
+                <select name="topic" required defaultValue=""><option value="" disabled>Select a topic</option><option>Data Structures & Algorithms</option><option>System Design</option><option>Embedded Technologies</option><option>Career & interview prep</option><option>Spirituality & mental well-being</option></select>
               </label>
-              <label>Short context<textarea rows="4" placeholder="Tell me what you're working through..."/></label>
-              <button className="button primary full" type="submit">Send request <ArrowUpRight size={17}/></button>
+              <label>Short context<textarea name="context" rows="4" placeholder="Tell me what you're working through..."/></label>
+              <button className="button primary full" type="submit" disabled={sending}>{sending ? "Sending..." : "Send request"} {!sending && <ArrowUpRight size={17}/>}</button>
+              {error && <small role="alert" className="form-error">{error}</small>}
               <small>Usually replies within 24–48 hours.</small>
             </>
           )}

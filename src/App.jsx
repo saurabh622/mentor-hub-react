@@ -46,7 +46,7 @@ function Hero() {
       </div>
       <div className="hero-card">
         <div className="portrait-placeholder">
-          <span>{profile.name.split(" ").map(x => x[0]).join("").slice(0,2).toUpperCase()}</span>
+          <img src="/saurabh-sahu.jpeg" alt="Saurabh Sahu" onError={e => { e.currentTarget.style.display = "none"; }} />
         </div>
         <div className="hero-card-caption">
           <div><b>Currently at JPMC</b><span>Building resilient financial infrastructure</span></div>
@@ -163,6 +163,7 @@ function Booking() {
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
+  const today = new Date().toISOString().split("T")[0];
   const submit = async e => {
     e.preventDefault();
     setError("");
@@ -206,6 +207,19 @@ function Booking() {
             <>
               <label>Name<input name="name" required placeholder="Your name"/></label>
               <label>Email<input name="email" required type="email" placeholder="you@example.com"/></label>
+              <div className="booking-time-grid">
+                <label>Preferred date<input name="preferredDate" required type="date" min={today}/></label>
+                <label>Preferred time
+                  <select name="preferredTime" required defaultValue="">
+                    <option value="" disabled>Select a time</option>
+                    <option>09:00 - 09:30 IST</option>
+                    <option>10:00 - 10:30 IST</option>
+                    <option>18:00 - 18:30 IST</option>
+                    <option>19:00 - 19:30 IST</option>
+                    <option>20:00 - 20:30 IST</option>
+                  </select>
+                </label>
+              </div>
               <label>What do you want help with?
                 <select name="topic" required defaultValue=""><option value="" disabled>Select a topic</option><option>Data Structures & Algorithms</option><option>System Design</option><option>Embedded Technologies</option><option>Career & interview prep</option><option>Spirituality & mental well-being</option></select>
               </label>
